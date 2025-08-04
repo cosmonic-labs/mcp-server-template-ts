@@ -3,6 +3,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 
+import {
+  pipeWebResponseToServerResponse,
+  webRequestToIncomingMessage,
+  createServerResponse,
+} from "../../../polyfills.js";
+
 // Map to store transports by session ID
 const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
 
@@ -96,8 +102,19 @@ const createMCPSession = async (c: Context) => {
     );
   }
 
-  // Handle the request
-  await transport.handleRequest(c.req.raw, c.res, body);
+  // TODO: transport.handleRequest does *not* work with web platform `Request`s,
+  // but instead works with Node's IncomingMessage -- we can't use that without shimming node
+  // at the engine level.
+  //
+  // We likely need to write the handler manually.
+  throw new Error("NOT IMPLEMENTED");
+
+  // // Handle the request
+  // await transport.handleRequest(
+  //   webRequestToIncomingMessage(c.req.raw),
+  //   nodeResp,
+  //   body,
+  // );
 
   return c.text("OK");
 };
