@@ -23,18 +23,25 @@ const handleSessionRequest = async (c: any) => {
 const createMCPSession = async (c: Context) => {
   // Check for existing session ID
   const sessionId = c.req.header("mcp-session-id");
-  let transport: StreamableHTTPServerTransport;
+  let transport: StreamableHTTPServerTransport | undefined = undefined;
 
+  // If an existing transport is present
   if (sessionId && transports[sessionId]) {
     // Reuse existing transport
     transport = transports[sessionId];
-  } else if (!sessionId && isInitializeRequest(await c.req.json())) {
+  }
+
+  // If no session is present but we're initializing
+  const body = await c.req.json();
+  if (!sessionId && isInitializeRequest(body)) {
     // New initialization request
     transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => "not-a-uuid",
       onsessioninitialized: (sessionId) => {
         // Store the transport by session ID
-        transports[sessionId] = transport;
+        if (transport !== undefined) {
+          transports[sessionId] = transport;
+        }
       },
       // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
       // locally, make sure to set:
@@ -44,7 +51,7 @@ const createMCPSession = async (c: Context) => {
 
     // Clean up transport when closed
     transport.onclose = () => {
-      if (transport.sessionId) {
+      if (transport?.sessionId) {
         delete transports[transport.sessionId];
       }
     };
@@ -57,8 +64,10 @@ const createMCPSession = async (c: Context) => {
 
     // Connect to the MCP server
     await server.connect(transport);
-  } else {
-    // Invalid request
+  }
+
+  // If we don't have a session ID and aren't initializing by this point, the request is invalid
+  if (!sessionId) {
     return c.json(
       {
         jsonrpc: "2.0",
@@ -72,9 +81,24 @@ const createMCPSession = async (c: Context) => {
     );
   }
 
+  // If the transport was never intiialized, something has gone wrong
+  if (transport === undefined) {
+    return c.json(
+      {
+        jsonrpc: "2.0",
+        error: {
+          code: -32000,
+          message: "Server Error: Failed to initialize transport",
+        },
+        id: null,
+      },
+      500,
+    );
+  }
+
   // Handle the request
-  const body = await c.req.json();
   await transport.handleRequest(c.req.raw, c.res, body);
+
   return c.text("OK");
 };
 
