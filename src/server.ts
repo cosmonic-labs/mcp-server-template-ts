@@ -10,7 +10,9 @@ const server = new Hono();
 server.use(logger());
 
 server.get("/", async (c) => {
-  return c.text("Hello world!");
+  // You can pass environment variables when you run this via:
+  // `wasmtime serve -Scli --env TEST=example dist/component.wasm`
+  return c.json({ msg: "Hello world!", envVars: c.env });
 });
 
 setupRoutes(server);
