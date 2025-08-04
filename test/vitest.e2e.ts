@@ -12,7 +12,7 @@ export default defineConfig({
     disableConsoleIntercept: true,
     printConsoleTrace: true,
     passWithNoTests: false,
-    include: ["test/e2e/**/*.js"],
+    include: ["test/e2e/**/*.ts"],
     testTimeout: DEFAULT_TIMEOUT_MS,
     hookTimeout: DEFAULT_TIMEOUT_MS,
     teardownTimeout: DEFAULT_TIMEOUT_MS,
