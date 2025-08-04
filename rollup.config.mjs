@@ -20,18 +20,21 @@ export default defineConfig({
   plugins: [
     alias({
       entries: [
-        { find: 'node:crypto', replacement: resolve(__dirname, 'src/polyfills.js') }
-      ]
+        {
+          find: "node:crypto",
+          replacement: resolve(__dirname, "src/polyfills.js"),
+        },
+      ],
     }),
-    typescript({ noEmitOnError: true }), 
+    typescript({ noEmitOnError: true }),
     json(),
     nodeResolve({
       preferBuiltins: false,
-      browser: true
+      browser: true,
     }),
     commonjs({
       include: /node_modules/,
-      transformMixedEsModules: true
-    })
-  ]
+      transformMixedEsModules: true,
+    }),
+  ],
 });

@@ -11,7 +11,7 @@ import { getEnvironment } from "wasi:cli/environment@0.2.3";
 
 import { handleError } from "./errorHandling";
 
-function serve<
+function fire<
   E extends Env = Env,
   S extends Schema = BlankSchema,
   BasePath extends string = "/",
@@ -23,4 +23,4 @@ function serve<
   });
 }
 
-export { serve };
+export { fire };
