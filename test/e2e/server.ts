@@ -4,7 +4,9 @@ import { setupE2E, setupMCPClient } from "../common.js";
 
 suite("MCP component", () => {
   test("works", async () => {
-    const { url } = await setupE2E();
+    const { url } = await setupE2E({
+      path: "/v1/mcp/session",
+    });
     const { client } = await setupMCPClient({ url });
     expect(client).toBeTruthy();
   });
