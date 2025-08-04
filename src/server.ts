@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { showRoutes } from "hono/dev";
 import { logger } from "hono/logger";
-// import { fire } from "hono/service-worker";
-import { fire } from "./wasmcloud/hono-adapter/server.js";
+import { fire } from "hono/service-worker";
+// import { fire } from "./wasmcloud/hono-adapter/server.js";
 
 import { setupRoutes } from "./routes/index.js";
 
