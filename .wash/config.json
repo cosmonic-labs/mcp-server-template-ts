@@ -1,0 +1,12 @@
+{
+  "build": {
+    "typescript": {
+      "package_manager": "npm",
+      "build_command": "build",
+      "build_flags": [],
+      "skip_install": false,
+      "source_maps": false
+    }
+  },
+  "templates": []
+}

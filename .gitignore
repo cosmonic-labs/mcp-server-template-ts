@@ -1,0 +1,13 @@
+node_modules
+generated
+dist
+build
+.rollup.cache
+*.wasm
+*.d.ts
+*.map
+*.tsbuildinfo
+*.tsbuildinfo.gz
+*.tsbuildinfo.gz.br
+*.tsbuildinfo.gz.br.gz
+*.tsbuildinfo.gz.br.gz.br

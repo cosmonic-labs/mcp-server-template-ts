@@ -1,0 +1,68 @@
+{
+  "name": "@cosmonic-labs/mcp-server-template",
+  "version": "1.0.0",
+  "description": "Template for MCP Servers",
+  "keywords": [
+    "wasm",
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "mcp-server-template",
+    "agent",
+    "ai",
+    "starter",
+    "template",
+    "generator"
+  ],
+  "homepage": "https://github.com/cosmonic-labs/mcp-server-template#readme",
+  "bugs": {
+    "url": "https://github.com/cosmonic-labs/mcp-server-template/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cosmonic-labs/mcp-server-template.git"
+  },
+  "scripts": {
+    "postinstall": "npm run generate:types",
+    "generate:types": "rimraf generated/types && jco guest-types ./wit -o generated/types",
+    "build:ts": "rollup -c",
+    "build:js": "jco componentize -w wit -o dist/component.wasm dist/server.js",
+    "build": "npm run generate:types && npm run build:ts && npm run build:js",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css}\"",
+    "format-ci": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css}\"",
+    "lint": "eslint src/**/*.js",
+    "start": "npm run dev",
+    "dev": "wash dev",
+    "test": "vitest --run"
+  },
+  "license": "Apache-2.0",
+  "author": "Cosmonic",
+  "type": "module",
+  "main": "dist/server.js",
+  "devDependencies": {
+    "@bytecodealliance/componentize-js": "^0.18.4",
+    "@bytecodealliance/jco": "^1.13.0",
+    "@eslint/js": "^9.24.0",
+    "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^27.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.41.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.6.3",
+    "vitest": "^3.1.1",
+    "wait-on": "^8.0.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.1",
+    "@hono/node-server": "^1.14.3",
+    "@hono/swagger-ui": "^0.5.2",
+    "hono": "^4.7.11"
+  }
+}
