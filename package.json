@@ -62,6 +62,7 @@
     "wait-on": "^8.0.3"
   },
   "dependencies": {
+    "@hono/mcp": "^0.1.1",
     "@hono/node-server": "^1.14.3",
     "@hono/swagger-ui": "^0.5.2",
     "@modelcontextprotocol/sdk": "^1.17.1",
