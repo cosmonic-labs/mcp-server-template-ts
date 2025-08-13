@@ -26,6 +26,7 @@ wash openapi2mcp <file>
 ** TODO Same chart, different demos/repos
 * TODO For demo of wash plugin
 * TODO Future features
+** TODO Template client, server and MCP server
 ** TODO State saving via a message bus
 - Keeping all incoming/outgoing messages via a wasi:messaging plugin (Kafka)
 - This is a lever for value-added observability/repeatability/training
