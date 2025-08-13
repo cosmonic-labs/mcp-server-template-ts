@@ -37,16 +37,46 @@ manipulate resources, run tools, and more.
 
 ## Generate a production-ready repository
 
-Generate a GitHub Repo based on your OpenAPI specification by using this template:
+### 1. Use our golden template to build a repository:
 
-< GITHUB TEMPLATE REPO w/ pre-populated Github Action >
+```console
+wash new <...>
+```
+
+If you have have a pre-existing OpenAPI schema, add it to the repository:
+
+```console
+cp path/to/schema infra/openapi/schema
+```
+
+> [!NOTE]
+> It's fine if you don't have a local file OpenAPI schema,
+> you can use a URL to a hosted schema later.
+
+After that you can push to GitHub:
+
+```console
+git push
+```
+
+#### Alternatively, clone our template repository on GitHub
+
+< LINK TO GOLDEN TEMPLATE >
+
+### 2. Generate a WebAssembly component from your repo
+
+To generate a WebAssembly component from your repository, use the pre-packaged
+Github Action that publishes the component:
 
 Run the public action <action name> which will build the component and push it to a temporary
 registry ([tty.sh](https://tty.sh)).
 
-## Deploy to Cosmonic
 
-Once your MCP server is ready for primetime, run it on your [Comonic][cosmonic] cluster.
+## Deploy
+
+### Set up Cosmonic Control
+
+Once your MCP server is ready for primetime, ensure your [Comonic][cosmonic] cluster is running.
 
 <details>
 <summary>Don't have a Comsonic cluster set up?</summary>
@@ -63,15 +93,45 @@ helm install cosmonic-control oci://ghcr.io/cosmonic/cosmonic-control \
   --create-namespace \
   --set cosmonicLicenseKey="<insert license here>"
 ```
-
 </details>
 
+### Deploy the application
+
 With the operator up and running we can start a `HostGroup`, which is a set of [wasmCloud][wasmcloud]
-instances that are configured to work together:
+instances that are configured to work together.
+
+### With Helm CLI
 
 ```console
-helm install <example project repo> \
-  --component-ref oci://tty.sh/<org>/<repo>/v1:1h
+helm install <example helm project repo> \
+  --namespace <ns> \
+  --component-ref oci://tty.sh/<org>/<repo>/v1:1h \
+  --http-config-endpoints
+```
+
+### With ArgoCD
+
+If using ArgoCD, you can install the following Helm chart:
+
+```
+<example helm project repo>
+```
+
+## Connect to the deployed MCP server
+
+If running with a k8s cluster, you can port forward:
+
+```console
+kubectl port-forward svc/<host-service>:<port>
+```
+
+Once you have a local port forward configured to your Cosmonic Control cluster,
+use [the official MCP model inspector][model-inspector] to connect.
+
+You can start the MCP inspector via the following command:
+
+```console
+npm run inspector
 ```
 
 [cosmonic]: https://cosmonic.com
