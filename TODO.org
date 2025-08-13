@@ -29,3 +29,7 @@ wash openapi2mcp <file>
 ** TODO State saving via a message bus
 - Keeping all incoming/outgoing messages via a wasi:messaging plugin (Kafka)
 - This is a lever for value-added observability/repeatability/training
+
+** TODO ArgoCD Application repository integration
+- Follow this
+  - https://github.com/cosmonic-labs/control-demos/tree/main/integrations/argo-cd
