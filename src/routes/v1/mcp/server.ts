@@ -131,6 +131,8 @@ export class MCPServer extends UpstreamMCPServer {
       // allowedHosts: ['127.0.0.1'],
     });
 
+    // TODO: Transport generation/hydration as a Hono middleware?
+
     const server = new MCPServer({
       name: "example-server",
       version: "1.0.0",
