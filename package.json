@@ -26,7 +26,7 @@
     "postinstall": "npm run generate:types",
     "generate:types": "rimraf generated/types && jco guest-types ./wit -o generated/types",
     "build:ts": "rollup -c",
-    "build:js": "jco componentize -w wit -o dist/component.wasm dist/server.js",
+    "build:js": "jco componentize -w wit -o dist/component.wasm dist/component.js",
     "build": "npm run generate:types && npm run build:ts && npm run build:js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css}\"",
     "format-ci": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css}\"",
@@ -42,7 +42,7 @@
   "license": "Apache-2.0",
   "author": "Cosmonic",
   "type": "module",
-  "main": "dist/server.js",
+  "main": "dist/component.js",
   "devDependencies": {
     "@bytecodealliance/componentize-js": "^0.18.4",
     "@bytecodealliance/jco": "^1.13.0",
