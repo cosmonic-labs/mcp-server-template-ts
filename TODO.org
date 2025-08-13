@@ -4,6 +4,8 @@
 ** TODO Add support for on-disk/in-repo OpenAPI Schema
 ** TODO Add support for URL OpenAPI Schema
 - Needs to be possible from GH Action
+** TODO Hello world tool
+- Something simple is fine, even if it just prints "Hello World"
 * TODO Template repo
 ** TODO use setup-wash action
 ** TODO Add sample OpenAPI schema to the repo
