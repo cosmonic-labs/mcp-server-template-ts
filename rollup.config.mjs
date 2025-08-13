@@ -10,10 +10,10 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  input: "src/server.ts",
+  input: "src/component.ts",
   external: [/wasi:.*/],
   output: {
-    file: "dist/server.js",
+    file: "dist/component.js",
     format: "esm",
     sourcemap: true,
   },
