@@ -1,32 +1,14 @@
 import type { Hono, Context } from "hono";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 import { StreamableHTTPTransport } from "@hono/mcp";
 import {
   CallToolResult,
   ReadResourceResult,
 } from "@modelcontextprotocol/sdk/types.js";
 import z from "zod";
-/**
- * Simple UUID v4 implementation for environments without crypto.randomUUID
- */
-function generateUUID(): string {
-  const hex = "0123456789abcdef";
-  let uuid = "";
 
-  for (let i = 0; i < 36; i++) {
-    if (i === 8 || i === 13 || i === 18 || i === 23) {
-      uuid += "-";
-    } else if (i === 14) {
-      uuid += "4"; // Version 4
-    } else if (i === 19) {
-      uuid += hex[(Math.random() * 4) | 8]; // Variant
-    } else {
-      uuid += hex[(Math.random() * 16) | 0];
-    }
-  }
-
-  return uuid;
-}
+// import { getCrypto } from "../../../polyfills";
 
 /**
  * Create a new MCP server instance with configured tools and resources
@@ -53,7 +35,7 @@ const createMcpServer = () => {
     },
     async (
       { interval, count },
-      { sendNotification }
+      { sendNotification },
     ): Promise<CallToolResult> => {
       const sleep = (ms: number) =>
         new Promise((resolve) => setTimeout(resolve, ms));
@@ -84,7 +66,7 @@ const createMcpServer = () => {
           },
         ],
       };
-    }
+    },
   );
 
   // Create a simple resource at a fixed URI
@@ -101,7 +83,7 @@ const createMcpServer = () => {
           },
         ],
       };
-    }
+    },
   );
 
   return server;
@@ -112,88 +94,50 @@ const createMcpServer = () => {
  */
 const handleMCPRequest = async (c: Context) => {
   const method = c.req.method;
-  const sessionId = c.req.header("mcp-session-id");
+
+  // Only POST is supported right now
+  if (method !== "POST") {
+    return c.text("Method not allowed", 405);
+  }
 
   // Handle POST requests (JSON-RPC messages)
-  if (method === "POST") {
-    const body = await c.req.json();
-    
-    // Create a new transport and server for each request (stateless approach)
-    // This ensures each request is handled independently without relying on stored state
-    const transport = new StreamableHTTPTransport({
-      sessionIdGenerator: () => sessionId || generateUUID(),
-      // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
-      // locally, make sure to set:
-      // enableDnsRebindingProtection: true,
-      // allowedHosts: ['127.0.0.1'],
-    });
+  const body = await c.req.json();
 
-    const server = createMcpServer();
-    await server.connect(transport as any);
-    
-    try {
-      const response = await transport.handleRequest(c, body);
-      return response || c.text("OK");
-    } catch (error) {
-      console.error("Error handling MCP request:", error);
-      
-      // Handle cases where the request cannot be processed
-      const errorResponse = {
-        jsonrpc: "2.0",
-        error: {
-          code: -32603,
-          message: "Internal error processing request",
-          data: error instanceof Error ? error.message : String(error)
-        },
-        id: (body as any)?.id || null,
-      };
-      
-      // Use c.text with JSON string to avoid any Response API issues
-      return c.text(JSON.stringify(errorResponse), 500, {
-        'Content-Type': 'application/json',
-      });
-    }
-  }
+  // Create a new transport and server for each request (stateless approach)
+  // This ensures each request is handled independently without relying on stored state
+  const transport = new StreamableHTTPTransport({
+    // TODO: use a session ID generator once we have state set up
+    //
+    // TODO: Use session ID to attempt to retrieve the
+    // data associated with the StreamableHTTPTransport below
+    //
+    // Ideally we can store this state via wasmcloud:blobstore
+    // that can be connected to FS underneath, rather than wasi:keyvalue
+    //
+    // TODO: Enable stateful or stateless mode via ENV
+    //
+    // TODO: Enable customer-provided state
+    //   - include: previous agent request/response metadata (detect loops)
+    //
+    // TODO: We could consider messages being pulled/pushed to message stores?
+    //   make an issue about this and we can discuss it alter, maybe a proxy component
+    //   or a composed wrapper that does it.
+    //
+    //sessionIdGenerator: () => getCrypto().randomUUID(),
 
-  // Handle GET and DELETE requests (for streaming/subscription management)
-  if (method === "GET" || method === "DELETE") {
-    // In stateless mode, we create a temporary transport to handle the request
-    // Note: This may not support long-lived connections, but handles the protocol gracefully
-    try {
-      const transport = new StreamableHTTPTransport({
-        sessionIdGenerator: () => sessionId || generateUUID(),
-        // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
-        // locally, make sure to set:
-        // enableDnsRebindingProtection: true,
-        // allowedHosts: ['127.0.0.1'],
-      });
+    sessionIdGenerator: undefined,
 
-      const server = createMcpServer();
-      await server.connect(transport as any);
-      
-      const response = await transport.handleRequest(c);
-      return response || c.text("OK");
-    } catch (error) {
-      console.error("Error handling GET/DELETE request:", error);
-      const errorResponse = {
-        jsonrpc: "2.0",
-        error: {
-          code: -32603,
-          message: "Internal error processing request",
-          data: error instanceof Error ? error.message : String(error)
-        },
-        id: null,
-      };
-      
-      // Use c.text with JSON string to avoid any Response API issues
-      return c.text(JSON.stringify(errorResponse), 500, {
-        'Content-Type': 'application/json',
-      });
-    }
-  }
+    // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
+    // locally, make sure to set:
+    // enableDnsRebindingProtection: true,
+    // allowedHosts: ['127.0.0.1'],
+  });
 
-  // Unsupported method
-  return c.text("Method not allowed", 405);
+  const server = createMcpServer();
+  await server.connect(transport as any);
+
+  const response = await transport.handleRequest(c, body);
+  return response || c.text("OK");
 };
 
 export function setupRoutes(app: Hono) {
