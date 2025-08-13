@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm view:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm ls:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:spec.modelcontextprotocol.io)",
+      "WebFetch(domain:modelcontextprotocol.io)",
+      "Bash(npm run test:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm info:*)",
+      "Bash(npm test)",
+      "Bash(timeout 30s npm run test:e2e)",
+      "Bash(npm run lint)",
+      "Bash(timeout 10s npm run test:e2e)"
+    ],
+    "deny": []
+  }
+}

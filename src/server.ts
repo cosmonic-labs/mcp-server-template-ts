@@ -5,6 +5,10 @@ import { fire } from "hono/service-worker";
 // import { fire } from "./wasmcloud/hono-adapter/server.js";
 
 import { setupRoutes } from "./routes/index.js";
+import { setupPolyfills } from "./polyfills.js";
+
+// Set up polyfills for WASI environment
+setupPolyfills();
 
 const server = new Hono();
 server.use(logger());
