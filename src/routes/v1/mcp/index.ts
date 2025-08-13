@@ -42,6 +42,8 @@ const handleMCPRequest = async (c: Context) => {
     //
     // TODO: remove versioning (this will be handled by either a composed outer component or the HTTP provider)
     //
+    // TODO: Current tool doesn't work 'Server does not support logging (required for notifications/message)'
+    //
     //sessionIdGenerator: () => getCrypto().randomUUID(),
 
     sessionIdGenerator: undefined,
