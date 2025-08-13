@@ -1,2 +1,11 @@
 * TODO Tests
 - [ ] Tests (unit, etc)
+* TODO Deployment
+** TODO On-start 
+- control-host checks what components to run @ startup inside the container
+- initContainer could have this
+  #+BEGIN_SRC
+wash openapi2mcp <file>
+  #+END_SRC
+* TODO For demo of wash plugin
+- 
