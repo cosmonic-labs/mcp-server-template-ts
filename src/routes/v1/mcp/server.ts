@@ -56,9 +56,8 @@ export class MCPServer extends UpstreamMCPServer {
 
       sessionIdGenerator: undefined,
 
-      // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
-      // locally, make sure to set:
-      // enableDnsRebindingProtection: true,
+      // DNS rebinding protection is disabled by default for backwards compatibility.
+      enableDnsRebindingProtection: true,
       // allowedHosts: ['127.0.0.1'],
     });
 
