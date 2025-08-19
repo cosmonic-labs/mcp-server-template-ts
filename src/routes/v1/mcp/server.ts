@@ -6,12 +6,35 @@ import { Context } from "hono";
 import { setupAllTools } from "./tools";
 import { setupAllResources } from "./resources";
 
+// Used for OAuth support
+// Uncomment and configure for authenticated backends
+// import { setupOAuthProvider, type OAuthConfig } from "./auth";
+// import {getAll as getConfig} from 'wasi:config/runtime@0.2.0-draft';
+
 export class MCPServer extends UpstreamMCPServer {
   constructor(opts: any) {
     super(opts);
     const server = this;
     setupAllTools(server);
     setupAllResources(server);
+    
+    // OAuth Authentication Setup (commented out for template use)
+    // Uncomment and configure for authenticated backends
+    /*
+    const env = Object.fromEntries(getConfig());
+    const oauthConfig: OAuthConfig = {
+      authorizationServerUrl: env.OAUTH_AUTHORIZATION_SERVER_URL || "https://your-oauth-server.com",
+      clientId: env.OAUTH_CLIENT_ID,
+      clientSecret: env.OAUTH_CLIENT_SECRET,
+      scope: env.OAUTH_SCOPE || "read write",
+      resourceIndicator: env.OAUTH_RESOURCE_INDICATOR || "mcp://server",
+    };
+    
+    const oauthProvider = setupOAuthProvider(server, oauthConfig);
+    
+    // Store the OAuth provider for use in request handling
+    (this as any).oauthProvider = oauthProvider;
+    */
   }
 
   /**
@@ -24,6 +47,33 @@ export class MCPServer extends UpstreamMCPServer {
     if (method !== "POST") {
       return c.text("Method not allowed", 405);
     }
+
+    // OAuth Authentication (commented out for template use)
+    // Uncomment for authenticated backends
+    /*
+    const oauthConfig: OAuthConfig = {
+      authorizationServerUrl: process.env.OAUTH_AUTHORIZATION_SERVER_URL || "https://your-oauth-server.com",
+      clientId: process.env.OAUTH_CLIENT_ID,
+      clientSecret: process.env.OAUTH_CLIENT_SECRET,
+      scope: process.env.OAUTH_SCOPE || "read write",
+      resourceIndicator: process.env.OAUTH_RESOURCE_INDICATOR || "mcp://server",
+    };
+    
+    const oauthProvider = setupOAuthProvider({} as any, oauthConfig);
+    const authResult = await oauthProvider.authenticateRequest(c);
+    
+    if (!authResult.authenticated) {
+      return c.json({
+        error: {
+          code: -32600,
+          message: "Authentication required",
+          data: "Valid OAuth access token required in Authorization header"
+        }
+      }, 401);
+    }
+    
+    // User context is available in authResult.user for authorized requests
+    */
 
     // Handle POST requests (JSON-RPC messages)
     const body = await c.req.json();
