@@ -1,34 +1,60 @@
 import { fileURLToPath, URL } from "node:url";
+import { debuglog } from "node:util";
 import { createServer as createNetServer, Server } from "node:net";
 import { env } from "node:process";
-import { stat } from "node:fs/promises";
+import { resolve, join } from "node:path";
+import { tmpdir } from "node:os";
+import { stat, mkdir, copyFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import terminate from "terminate";
+import { hashElement } from "folder-hash";
+
+const log = debuglog("test");
 
 /** Where to find Jco as an executable */
-const JCO_PATH = env.JCO_PATH ?? "jco";
+const TEST_JCO_CMD = env.TEST_JCO_CMD ?? `npx jco`;
 
 /** Path to the WASM file to be used */
 const WASM_PATH = fileURLToPath(
   new URL(env.WASM_PATH ?? "../dist/component.wasm", import.meta.url),
 );
 
-interface SetupE2EOpts {
+/** Path to the src folder */
+const SRC_FOLDER_PATH = fileURLToPath(
+  new URL(env.WASM_PATH ?? "../src", import.meta.url),
+);
+
+/** Path to the dist folder */
+const DIST_FOLDER_PATH = fileURLToPath(
+  new URL(env.WASM_PATH ?? "../dist", import.meta.url),
+);
+
+/** Args for `setupE2E()` */
+interface SetupE2EArgs {
   path?: string;
+  testWASMPath?: string;
 }
 
+/** Returned by `setupE2E()` */
 interface E2ETestSetup {
-  url: URL;
+  serverURL: URL;
   [Symbol.dispose]: () => Promise<void> | void;
 }
 
-/** Setup for an E2E test */
-export async function setupE2E(opts: SetupE2EOpts): Promise<E2ETestSetup> {
+/**
+ * Setup for an E2E test, starting a server that is serving
+ * the MCP component provided
+ * @param {SetupE2EArgs} args
+ * @returns {Promise<E2ETestSetup>}
+ */
+export async function setupE2E(args: SetupE2EArgs): Promise<E2ETestSetup> {
+  const wasmPath = args.testWASMPath ?? WASM_PATH;
+
   // Determine paths to jco and output wasm
-  const wasmPathExists = await stat(WASM_PATH)
+  const wasmPathExists = await stat(wasmPath)
     .then((p) => p.isFile())
     .catch(() => false);
   if (!wasmPathExists) {
@@ -41,32 +67,45 @@ export async function setupE2E(opts: SetupE2EOpts): Promise<E2ETestSetup> {
   const randomPort = await getRandomPort();
 
   // Spawn jco serve
+  log(`SPAWN: ${TEST_JCO_CMD} serve --port ${randomPort} ${wasmPath}`);
   const proc = spawn(
-    JCO_PATH,
-    ["serve", "--port", randomPort.toString(), WASM_PATH],
+    TEST_JCO_CMD,
+    ["serve", "--port", randomPort.toString(), wasmPath],
     {
       detached: false,
       stdio: "pipe",
-      shell: false,
+      shell: true,
     },
   );
 
   // Wait for the server to start
-  await new Promise((resolve) => {
-    proc.stderr.on("data", (data: string) => {
-      if (data.includes("Server listening")) {
-        resolve(null);
-      }
-    });
-  });
+  await Promise.race([
+    new Promise((resolve) => {
+      proc.stderr.on("data", (data: string) => {
+        log(`(jco serve) STDERR: ${data}`);
+        if (data.includes("Server listening")) {
+          resolve(null);
+        }
+      });
+    }),
+    new Promise((_resolve, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error("timed out waiting for spawned jco serve server listen"),
+          ),
+        1000 * 10,
+      ),
+    ),
+  ]);
 
   const url = new URL(`http://localhost:${randomPort}`);
-  if (opts?.path) {
-    url.pathname = opts.path;
+  if (args?.path) {
+    url.pathname = args.path;
   }
 
   return {
-    url,
+    serverURL: url,
     [Symbol.dispose]: () => {
       if (proc.pid === undefined) {
         throw new Error("unexpectedly undefined PID");
@@ -91,18 +130,19 @@ export async function getRandomPort(): Promise<number> {
   });
 }
 
-interface SetupMCPClientOpts {
+/** Options for `setupMCPClient()` */
+interface SetupMCPClientArgs {
   url: URL;
 }
 
 /**
  * Set up an MCP client
  *
- * @param {object} opts
- * @param {URL} opts.url
+ * @param {object} args
+ * @param {URL} args.url
  */
-export async function setupMCPClient(opts: SetupMCPClientOpts) {
-  const { url } = opts;
+export async function setupMCPClient(args: SetupMCPClientArgs) {
+  const { url } = args;
 
   let client: Client | undefined = undefined;
   client = new Client({
@@ -114,4 +154,76 @@ export async function setupMCPClient(opts: SetupMCPClientOpts) {
   await client.connect(transport as any);
 
   return { client };
+}
+
+/** Options for `ensureComponentBuild()` */
+interface EnsureTestComponentBuildArgs {
+  tmpDirBasePath?: string;
+}
+
+const TEST_COMPONENT_NAME = "component.wasm";
+
+/**
+ * Ensure the test component is built
+ *
+ * @param {EnsureTestComponentBuildArgs} args
+ * @returns {Promise<{ componentPath: string}>}
+ */
+export async function ensureTestComponentBuild(
+  args?: EnsureTestComponentBuildArgs,
+): Promise<{ componentPath: string }> {
+  // If an override was provided, use it
+  if (env.TEST_COMPONENT_PATH) {
+    return { componentPath: env.TEST_COMPONENT_PATH };
+  }
+
+  // Calculate the SHA of the src directory
+  const { hash } = await hashElement(SRC_FOLDER_PATH);
+  const dirName = `mcp-server-test-run-${encodeURIComponent(hash)}`;
+  let tmpDirPath = args?.tmpDirBasePath ?? tmpdir();
+  const expectedDirPath = resolve(join(tmpDirPath, dirName));
+  await mkdir(expectedDirPath, { recursive: true });
+
+  const componentPath = resolve(expectedDirPath, TEST_COMPONENT_NAME);
+
+  // If the component already exists, we can exit early
+  const componentExists = await stat(componentPath)
+    .then((p) => p.isFile())
+    .catch(() => false);
+  if (componentExists) {
+    log(`using existing component @ [${componentPath}]`);
+    return {
+      componentPath,
+    };
+  }
+
+  // Run NPM build to build the component
+  const proc = spawn("npm", ["run", "build"], {
+    detached: false,
+    stdio: "pipe",
+    shell: false,
+  });
+
+  await new Promise((resolve) => {
+    proc.stdout.on("data", (data: string) => {
+      if (data.includes("Successfully written")) {
+        resolve(null);
+      }
+    });
+  });
+
+  const builtComponentPath = join(DIST_FOLDER_PATH, TEST_COMPONENT_NAME);
+
+  // If the component already exists, we can exit early
+  const builtComponentExists = await stat(builtComponentPath)
+    .then((p) => p.isFile())
+    .catch(() => false);
+  if (!builtComponentExists) {
+    throw new Error(`failed to build test component @ [${builtComponentPath}]`);
+  }
+
+  // Copy over the built component to it's expected path
+  await copyFile(builtComponentPath, componentPath);
+
+  return { componentPath };
 }
