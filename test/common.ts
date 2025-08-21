@@ -9,7 +9,6 @@ import { spawn } from "node:child_process";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import terminate from "terminate";
 import { hashElement } from "folder-hash";
 
 const log = debuglog("test");
@@ -110,7 +109,8 @@ export async function setupE2E(args: SetupE2EArgs): Promise<E2ETestSetup> {
       if (proc.pid === undefined) {
         throw new Error("unexpectedly undefined PID");
       }
-      terminate(proc.pid);
+      proc.kill();
+      log(`terminated jco serve process with PID [${proc.pid}]`);
     },
   };
 }
