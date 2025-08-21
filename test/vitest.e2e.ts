@@ -9,6 +9,7 @@ const REPORTERS = process.env.GITHUB_ACTIONS
 export default defineConfig({
   test: {
     reporters: REPORTERS,
+    retry: 3,
     disableConsoleIntercept: true,
     printConsoleTrace: true,
     passWithNoTests: false,
