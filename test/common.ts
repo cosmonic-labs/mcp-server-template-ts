@@ -14,7 +14,7 @@ import { hashElement } from "folder-hash";
 const log = debuglog("test");
 
 /** Where to find Jco as an executable */
-const TEST_JCO_CMD = env.TEST_JCO_CMD ?? `npx jco`;
+const TEST_WASMTIME_CMD = env.TEST_WASMTIME_CMD ?? `wasmtime`;
 
 /** Path to the WASM file to be used */
 const WASM_PATH = fileURLToPath(
@@ -65,24 +65,28 @@ export async function setupE2E(args: SetupE2EArgs): Promise<E2ETestSetup> {
   // Generate a random port
   const randomPort = await getRandomPort();
 
-  // Spawn jco serve
-  log(`SPAWN: ${TEST_JCO_CMD} serve --port ${randomPort} ${wasmPath}`);
-  const proc = spawn(
-    TEST_JCO_CMD,
-    ["serve", "--port", randomPort.toString(), wasmPath],
-    {
-      detached: false,
-      stdio: "pipe",
-      shell: true,
-    },
-  );
+  // Spawn wasmtime serve
+  const cmdArgs = [
+    "serve",
+    "-S",
+    "cli",
+    "--addr",
+    `127.0.0.1:${randomPort}`,
+    wasmPath,
+  ];
+  log(`SPAWN: ${TEST_WASMTIME_CMD} ${cmdArgs.join(" ")}`);
+  const proc = spawn(TEST_WASMTIME_CMD, cmdArgs, {
+    detached: false,
+    stdio: "pipe",
+    shell: true,
+  });
 
   // Wait for the server to start
   await Promise.race([
     new Promise((resolve) => {
       proc.stderr.on("data", (data: string) => {
-        log(`(jco serve) STDERR: ${data}`);
-        if (data.includes("Server listening")) {
+        log(`(wasmtime serve) STDERR: ${data}`);
+        if (data.includes("Serving HTTP")) {
           resolve(null);
         }
       });
@@ -91,7 +95,9 @@ export async function setupE2E(args: SetupE2EArgs): Promise<E2ETestSetup> {
       setTimeout(
         () =>
           reject(
-            new Error("timed out waiting for spawned jco serve server listen"),
+            new Error(
+              "timed out waiting for spawned wasmtime serve server listen",
+            ),
           ),
         1000 * 10,
       ),

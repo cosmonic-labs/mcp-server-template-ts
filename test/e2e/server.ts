@@ -3,7 +3,7 @@ import { suite, test, expect, beforeAll } from "vitest";
 import {
   ensureTestComponentBuild,
   setupE2E,
-  // setupMCPClient,
+  setupMCPClient,
 } from "../common.js";
 import { MCP_BASE_PATH } from "../../src/routes/v1/mcp/index.js";
 
@@ -22,10 +22,7 @@ suite("MCP component", () => {
       testWASMPath,
     });
 
-    // NOTE: the lines below can be uncommented once we use the hono adapter
-    // as repeated fetch-event calls don't work
-
-    // const { client } = await setupMCPClient({ url: testSetup.serverURL });
-    // expect(client).toBeTruthy();
+    const { client } = await setupMCPClient({ url: testSetup.serverURL });
+    expect(client).toBeTruthy();
   });
 });
