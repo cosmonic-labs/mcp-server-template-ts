@@ -35,44 +35,13 @@ manipulate resources, run tools, and more.
 
 [model-inspector]: https://github.com/modelcontextprotocol/inspector
 
-## Generate a production-ready repository
+## Generate a MCP Server from our template
 
 ### 1. Use our golden template to build a repository:
 
 ```console
 wash new <...>
 ```
-
-If you have have a pre-existing OpenAPI schema, add it to the repository:
-
-```console
-cp path/to/schema infra/openapi/schema
-```
-
-> [!NOTE]
-> It's fine if you don't have a local file OpenAPI schema,
-> you can use a URL to a hosted schema later.
-
-After that you can push to GitHub:
-
-```console
-git push
-```
-
-#### Alternatively, clone our template repository on GitHub
-
-< LINK TO GOLDEN TEMPLATE >
-
-### 2. Generate a WebAssembly component from your repo
-
-To generate a WebAssembly component from your repository, use the pre-packaged
-Github Action that publishes the component:
-
-Run the public action <action name> which will build the component and push it to a temporary
-registry ([tty.sh](https://tty.sh)).
-
-
-## Deploy
 
 ### Set up Cosmonic Control
 
@@ -92,6 +61,8 @@ helm install cosmonic-control oci://ghcr.io/cosmonic/cosmonic-control \
   --namespace cosmonic-system \
   --create-namespace \
   --set cosmonicLicenseKey="<insert license here>"
+
+helm install hostgroup oci://ghcr.io/cosmonic/cosmonic-control-hostgroup --version 0.2.0 --namespace cosmonic-system --set http.enabled=true
 ```
 </details>
 
@@ -103,18 +74,11 @@ instances that are configured to work together.
 ### With Helm CLI
 
 ```console
-helm install <example helm project repo> \
-  --namespace <ns> \
-  --component-ref oci://tty.sh/<org>/<repo>/v1:1h \
-  --http-config-endpoints
-```
-
-### With ArgoCD
-
-If using ArgoCD, you can install the following Helm chart:
-
-```
-<example helm project repo>
+# Note substitue your own pushed image
+helm install weather-gov-mcp oci://ghcr.io/cosmonic-labs/charts/http-sample \
+  -n weather-gov --create-namespace \
+  --set component.image=ghcr.io/cosmonic-labs/components/weather-gov-mcp:0.1.0 \
+  --set component.name=weather-gov-mcp 
 ```
 
 ## Connect to the deployed MCP server
@@ -122,7 +86,7 @@ If using ArgoCD, you can install the following Helm chart:
 If running with a k8s cluster, you can port forward:
 
 ```console
-kubectl port-forward svc/<host-service>:<port>
+kubectl -n cosmonic-system port-forward svc/hostgroup-default 9091:9091
 ```
 
 Once you have a local port forward configured to your Cosmonic Control cluster,
