@@ -20,7 +20,6 @@
     // TODO: consider enabling these
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
 
     // Module resolution
