@@ -31,29 +31,6 @@ export class MCPServer extends UpstreamMCPServer {
     // Create a new transport and server for each request (stateless approach)
     // This ensures each request is handled independently without relying on stored state
     const transport = new StreamableHTTPTransport({
-      // TODO: use a session ID generator once we have state set up
-      //
-      // TODO: Use session ID to attempt to retrieve the
-      // data associated with the StreamableHTTPTransport below
-      //
-      // Ideally we can store this state via wasmcloud:blobstore
-      // that can be connected to FS underneath, rather than wasi:keyvalue
-      //
-      // TODO: Enable stateful or stateless mode via ENV
-      //
-      // TODO: Enable customer-provided state
-      //   - include: previous agent request/response metadata (detect loops)
-      //
-      // TODO: We could consider messages being pulled/pushed to message stores?
-      //   make an issue about this and we can discuss it alter, maybe a proxy component
-      //   or a composed wrapper that does it.
-      //
-      // TODO: remove versioning (this will be handled by either a composed outer component or the HTTP provider)
-      //
-      // TODO: Current tool doesn't work 'Server does not support logging (required for notifications/message)'
-      //
-      //sessionIdGenerator: () => getCrypto().randomUUID(),
-
       sessionIdGenerator: undefined,
 
       // DNS rebinding protection is disabled by default for backwards compatibility.
