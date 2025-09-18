@@ -1,16 +1,19 @@
 import type { Hono } from "hono";
 import { MCPServer } from "./server.js";
+import {get as getConfig} from 'wasi:config/runtime@0.2.0-draft';
 
 export const MCP_BASE_PATH = "/v1/mcp";
 
 export function setupRoutes(app: Hono, mcpAuth?: any) {
+  const requiredScopes = getConfig("REQUIRED_SCOPES")?.split(',');
+  
   // If MCP Auth is configured, protect the MCP endpoint
   if (mcpAuth) {
     // Protected MCP endpoint with Bearer token authentication
     app.post(
       MCP_BASE_PATH,
       mcpAuth.bearerAuth('jwt', {
-        requiredScopes: process.env.REQUIRED_SCOPES?.split(',') || ['mcp:read', 'mcp:write']
+        requiredScopes: requiredScopes || ['mcp:read', 'mcp:write']
       }),
       MCPServer.handleMCPRequest
     );
@@ -19,7 +22,7 @@ export function setupRoutes(app: Hono, mcpAuth?: any) {
     app.post(
       `${MCP_BASE_PATH}/protected`,
       mcpAuth.bearerAuth('jwt', {
-        requiredScopes: process.env.REQUIRED_SCOPES?.split(',') || ['mcp:admin']
+        requiredScopes: requiredScopes || ['mcp:admin']
       }),
       MCPServer.handleMCPRequest
     );

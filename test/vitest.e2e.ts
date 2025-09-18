@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 
 const DEFAULT_TIMEOUT_MS = 1000 * 60 * 10; // 10m
 
-const REPORTERS = process.env.GITHUB_ACTIONS
+const REPORTERS = env.GITHUB_ACTIONS
   ? ["verbose", "github-actions"]
   : ["verbose"];
 

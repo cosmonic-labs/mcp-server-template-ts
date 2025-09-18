@@ -8,25 +8,29 @@ import { setupRoutes } from "./routes/index.js";
 import { setupPolyfills } from "./polyfills.js";
 import { createMCPAuthHono, fetchServerConfigForHono } from "./auth/mcp-auth-adapter.js";
 
+import {get as getConfig} from 'wasi:config/runtime@0.2.0-draft';
+
 // Set up polyfills for WASI environment
 setupPolyfills();
 
 const server = new Hono();
 server.use(logger());
 
+const OAUTH_ISSUER_URL = getConfig("OAUTH_ISSUER_URL");
+
 // Initialize MCP Auth if issuer URL is provided
 let mcpAuth: Awaited<ReturnType<typeof createMCPAuthHono>> | null = null;
-if (process.env.OAUTH_ISSUER_URL) {
+if (OAUTH_ISSUER_URL) {
   try {
     mcpAuth = await createMCPAuthHono(
-      process.env.OAUTH_ISSUER_URL,
-      (process.env.OAUTH_SERVER_TYPE as any) || 'oidc'
+      OAUTH_ISSUER_URL,
+      (getConfig("OAUTH_SERVER_TYPE") as any) || 'oidc'
     );
     
     // Add the protected resource metadata router
     server.use(mcpAuth.protectedResourceMetadataRouter());
-    
-    console.log('MCP Auth initialized with issuer:', process.env.OAUTH_ISSUER_URL);
+
+    console.log('MCP Auth initialized with issuer:', OAUTH_ISSUER_URL);
   } catch (error) {
     console.error('Failed to initialize MCP Auth:', error);
   }
