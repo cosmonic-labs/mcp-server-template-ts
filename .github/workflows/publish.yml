@@ -24,15 +24,23 @@ jobs:
         with:
           wash-version: 1.0.0-beta.6
 
-      - name: Compile Wasm binary
+
+      - name: Compile Wasm binary and capture component path
+        id: build
         run: |
-          wash build
+          set -e
+
+          artifact_path=$(wash build --output json | jq -r .data.artifact_path)
+          if [ -z "$artifact_path" ] || [ "$artifact_path" = "null" ]; then
+            echo "Failed to determine built component path" >&2
+            exit 1
+          fi
+          echo "component_path=$artifact_path" >> $GITHUB_OUTPUT
 
       - name: Verify Wasm binary exists
-        working-directory: ./dist
         run: |
-          if [ ! -f ./component.wasm ]; then
-            echo "Error: ./component.wasm not found!" >&2
+          if [ ! -f "${{ steps.build.outputs.component_path }}" ]; then
+            echo "Error: ${{ steps.build.outputs.component_path }} not found!" >&2
             exit 1
           fi
 
@@ -44,6 +52,5 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Wasm component to ghcr.io
-        working-directory: ./dist
         run: |
-          wash oci push ghcr.io/${GITHUB_REPOSITORY,,}:${{ github.ref_name }} ./component.wasm
+          wash oci push ghcr.io/${GITHUB_REPOSITORY,,}:${{ github.ref_name }} "${{ steps.build.outputs.component_path }}"
