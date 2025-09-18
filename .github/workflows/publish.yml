@@ -1,0 +1,48 @@
+name: Build Wasm component
+
+on: 
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ github.event.repository.name }}
+
+      - name: Setup wash CLI
+        uses: cosmonic-labs/setup-wash-action@main
+        with:
+          wash-version: 1.0.0-beta.6
+
+      - name: Compile Wasm binary
+        run: |
+          wash build
+
+      - name: Verify Wasm binary exists
+        working-directory: ./dist
+        run: |
+          if [ ! -f ./component.wasm ]; then
+            echo "Error: ./component.wasm not found!" >&2
+            exit 1
+          fi
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Wasm component to ghcr.io
+        working-directory: ./dist
+        run: |
+          wash oci push ghcr.io/${GITHUB_REPOSITORY,,}:${{ github.ref_name }} ./component.wasm
