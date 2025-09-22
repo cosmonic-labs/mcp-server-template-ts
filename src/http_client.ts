@@ -1,4 +1,5 @@
 import { BASE_URL } from "./constants";
+import { addAuth } from "./auth";
 
 export interface HTTPClientParams {
     baseUrl: string;
@@ -9,7 +10,7 @@ export interface CallParams {
     pathParams?: Record<string, string>;
     query?: Record<string, string>;
     method?: RequestInit['method'];
-    headers?: RequestInit['headers'];
+    headers?: Record<string, string>;
     body?: RequestInit['body'];
 }
 
@@ -20,7 +21,9 @@ export class HTTPClient {
         this.baseUrl = params.baseUrl;
     }
 
-    public call(params: CallParams): Promise<Response> {
+    public async call(params: CallParams): Promise<Response> {
+        await addAuth(params);
+
         let path = params.path;
         for (const [key, value] of Object.entries(params.pathParams ?? {})) {
             path = path.replace(`{${key}}`, value);
