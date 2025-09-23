@@ -1,5 +1,5 @@
 import { BASE_URL } from "./constants";
-import { addAuth } from "./auth";
+import { validateAuth } from "./auth";
 
 export interface HTTPClientParams {
     baseUrl: string;
@@ -22,7 +22,7 @@ export class HTTPClient {
     }
 
     public async call(params: CallParams): Promise<Response> {
-        await addAuth(params);
+        await validateAuth(params);
 
         let path = params.path;
         for (const [key, value] of Object.entries(params.pathParams ?? {})) {
