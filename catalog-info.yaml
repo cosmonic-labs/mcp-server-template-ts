@@ -1,12 +1,12 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.appName }}
+  name: ${{ appName }}
   description: A simple WebAssembly application example
   tags:
     - backend
     - webassembly
 spec:
   type: service
-  owner: ${{ values.githubOwner }}
+  owner: ${{ githubOwner }}
   lifecycle: development
