@@ -1,12 +1,12 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: {{ appName }}
+  name: example-app
   description: A simple WebAssembly application example
   tags:
     - backend
     - webassembly
 spec:
   type: service
-  owner: {{ githubOwner }}
+  owner: cosmonic-labs
   lifecycle: development
