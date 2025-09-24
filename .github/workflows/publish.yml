@@ -20,10 +20,11 @@ jobs:
           node-version: 22.x
 
       - name: Setup wash CLI
-        uses: cosmonic-labs/setup-wash-action@main
+        uses: cosmonic-labs/setup-wash-action@cache-plugins
         with:
           wash-version: 1.0.0-beta.6
-
+          plugins:
+            - ghcr.io/cosmonic-labs/plugins/openapi2mcp:0.4.0
 
       - name: Compile Wasm binary and capture component path
         id: build
