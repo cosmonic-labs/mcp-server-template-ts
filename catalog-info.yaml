@@ -1,16 +1,5 @@
 ---
 apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: cosmonic-labs
-spec:
-  type: team
-  profile:
-    displayName: Cosmonic Labs
-  children: []
-
----
-apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: example-app
@@ -20,5 +9,5 @@ metadata:
     - webassembly
 spec:
   type: service
-  owner: cosmonic-labs
+  owner: group:apps
   lifecycle: development
