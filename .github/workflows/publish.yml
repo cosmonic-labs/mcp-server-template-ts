@@ -24,7 +24,7 @@ jobs:
           node-version: 22.x
 
       - name: Setup wash CLI
-        uses: cosmonic-labs/setup-wash-action@main
+        uses: wasmcloud/setup-wash-action@main
         with:
           wash-version: 1.0.0-beta.7
 
