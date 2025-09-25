@@ -26,7 +26,7 @@ jobs:
       - name: Setup wash CLI
         uses: wasmcloud/setup-wash-action@main
         with:
-          wash-version: 1.0.0-beta.7
+          wash-version: wash-v1.0.0-beta.7
 
       - name: Compile Wasm binary and capture component path
         id: build
