@@ -7,9 +7,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io
-    
+
     permissions:
       contents: write
       packages: write
@@ -26,60 +24,15 @@ jobs:
       - name: Setup wash CLI
         uses: wasmcloud/setup-wash-action@main
         with:
-          wash-version: wash-v1.0.0-beta.7
+          wash-version: wash-v1.0.0-beta.8
 
-      - name: Compile Wasm binary and capture component path
+      - name: Build Wasm component
         id: build
-        run: |
-          set -e
+        uses: wasmCloud/actions/wash-build@v0.1.0
 
-          artifact_path=$(wash build --output json | jq -r .data.artifact_path)
-          if [ -z "$artifact_path" ] || [ "$artifact_path" = "null" ]; then
-            echo "Failed to determine built component path" >&2
-            exit 1
-          fi
-          echo "component_path=$artifact_path" >> $GITHUB_OUTPUT
-
-      - name: Verify Wasm binary exists
-        run: |
-          if [ ! -f "${{ steps.build.outputs.component_path }}" ]; then
-            echo "Error: ${{ steps.build.outputs.component_path }} not found!" >&2
-            exit 1
-          fi
-
-      - name: Login to container registry
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+      - name: Publish Wasm component  
+        uses: wasmcloud/actions/wash-oci-publish@v0.1.0
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set IMAGE_NAME env as lower-case repository name
-        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      - name: Push Wasm component to container registry
-        id: push
-        run: |
-          push_output=$(wash oci push --output json ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} "${{ steps.build.outputs.component_path }}")
-          # get digest from push output
-          digest=$(echo "$push_output" | jq -r .data.digest)
-          if [ -z "$digest" ] || [ "$digest" = "null" ]; then
-            echo "Failed to determine pushed component digest $push_output" >&2
-            exit 1
-          fi
-          echo "Component pushed with digest: $digest"
-          echo "digest=$digest" >> $GITHUB_OUTPUT
-
-      - name: Upload Wasm to GitHub Release
-        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
-        with:
-          files: ${{ steps.build.outputs.component_path }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          component_path: ${{ steps.build.outputs.component_path }}
+          attestation: false # add sbom attestation then enable
+          image_tags: ${{ github.ref_name }},latest
