@@ -1,0 +1,60 @@
+name: Generate MCP from OpenAPI
+
+on:
+    workflow_dispatch:
+        inputs:
+            spec_path:
+                description: 'Path to the OpenAPI specification file'
+                required: false
+                default: './openapi/spec.yaml'
+                type: string
+
+jobs:
+    generate:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+            - name: Setup wash CLI
+              uses: wasmcloud/setup-wash-action@v1.0.0-rc.2
+              with:
+                  plugins: ghcr.io/cosmonic-labs/plugins/openapi2mcp:0.5.0
+
+            - name: Check for OpenAPI specification
+              run: |
+                  SPEC_PATH="${{ github.event.inputs.spec_path }}"
+                  if [ ! -f "$SPEC_PATH" ]; then
+                    echo "⚠️ Error: $SPEC_PATH not found!"
+                    echo "Please place an OpenAPI specification file at $SPEC_PATH"
+                    echo "You can download a sample spec from: https://petstore3.swagger.io/api/v3/openapi.json"
+                    echo "Then rename it to the appropriate format and place it at the specified path"
+                    exit 1
+                  fi
+                  echo "✅ Found OpenAPI specification at $SPEC_PATH"
+
+            - name: Generate MCP from OpenAPI
+              run: |
+                  wash openapi2mcp "${{ github.event.inputs.spec_path }}"
+
+            - name: Create Pull Request
+              uses: peter-evans/create-pull-request@v5
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  commit-message: "feat: generate from OpenAPI spec"
+                  title: "Generate MCP Tools from OpenAPI specification"
+                  body: |
+                      This PR was automatically generated from the OpenAPI specification at:
+                      `${{ github.event.inputs.spec_path || './openapi/spec.yaml' }}`
+
+                      ## Changes
+                      - Generated MCP tools from OpenAPI spec
+                      - Updated code to match the API specification
+
+                      Please review the generated code before merging.
+                  branch: generate-mcp-from-openapi
+                  delete-branch: true

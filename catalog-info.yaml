@@ -1,8 +1,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: example-app
-  description: A simple WebAssembly application example
+  name: ${{ parameters.appName }}
+  description: Wasm MCP Server 
   tags:
     - backend
     - webassembly
