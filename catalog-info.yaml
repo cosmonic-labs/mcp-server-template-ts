@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ parameters.appName }}
+  name: ${{ values.appName }}
   description: Wasm MCP Server 
   tags:
     - backend
