@@ -23,7 +23,7 @@ jobs:
             - name: Setup wash CLI
               uses: wasmcloud/setup-wash-action@v1.0.0-rc.2
               with:
-                  plugins: ghcr.io/cosmonic-labs/plugins/openapi2mcp:0.5.0
+                  plugins: ghcr.io/cosmonic-labs/openapi2mcp:v0.5.0
 
             - name: Check for OpenAPI specification
               run: |
