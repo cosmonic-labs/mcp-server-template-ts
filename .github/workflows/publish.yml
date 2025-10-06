@@ -22,14 +22,14 @@ jobs:
           node-version: 22.x
 
       - name: Setup wash CLI
-        uses: wasmcloud/setup-wash-action@v1.0.0-rc.2
+        uses: wasmcloud/setup-wash-action@v1.0.0-rc.3
 
       - name: Build Wasm component
         id: build
-        uses: wasmCloud/actions/wash-build@v0.1.0
+        uses: wasmCloud/actions/wash-build@v0.2.0
 
       - name: Publish Wasm component  
-        uses: wasmcloud/actions/wash-oci-publish@v0.1.0
+        uses: wasmcloud/actions/wash-oci-publish@v0.2.0
         with:
           component_path: ${{ steps.build.outputs.component_path }}
           attestation: false # add sbom attestation then enable
