@@ -10,11 +10,20 @@ with [wasmCloud][wasmcloud].
 
 - Download [`wash`][wash]
 
-[wash]: https://github.com/cosmonic-labs/wash
+[wash]: https://github.com/wasmcloud/wash
 
 # Quickstart
 
-## Start the Development loop
+Clone this repository or use `wash` to create a new project that uses this repo as a template:
+
+```console
+wash new mcpserver --git https://github.com/cosmonic-labs/mcp-server-template-ts.git
+```
+```console
+cd mcpserver
+```
+
+## Start the development loop
 
 Build the component:
 
@@ -30,22 +39,29 @@ to run that you can run:
 npm run inspector
 ```
 
-Using the model inspector you can connect to the local MCP server via HTTP,
-manipulate resources, run tools, and more.
+Using the model inspector you can connect to the local MCP server via HTTP, manipulate resources, run tools, and more.
 
 [model-inspector]: https://github.com/modelcontextprotocol/inspector
 
-## Generate a MCP Server from our template
+## Optional: Generate MCP tools with the `openapi2mcp` plugin
 
-### 1. Use our golden template to build a repository:
+The [`openapi2mcp` plugin](https://github.com/cosmonic-labs/openapi2mcp) for `wash` enables you to generate MCP tools from an OpenAPI specification.
+
+Install the plugin:
 
 ```console
-wash new <...>
+wash plugin install ghcr.io/cosmonic-labs/plugins/openapi2mcp:0.5.0
+```
+
+Generate MCP tools into the server project from an OpenAPI specification:
+
+```console
+wash openapi2mcp [path/to/open/yaml/or/json] --project-path [path/to/generated/mcp/server]
 ```
 
 ### Set up Cosmonic Control
 
-Once your MCP server is ready for primetime, ensure your [Comonic][cosmonic] cluster is running.
+Once your MCP server is ready for primetime, ensure your [Cosmonic][cosmonic] cluster is running.
 
 <details>
 <summary>Don't have a Comsonic cluster set up?</summary>
