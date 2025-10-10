@@ -50,7 +50,7 @@ The [`openapi2mcp` plugin](https://github.com/cosmonic-labs/openapi2mcp) for `wa
 Install the plugin:
 
 ```console
-wash plugin install ghcr.io/cosmonic-labs/plugins/openapi2mcp:0.5.0
+wash plugin install ghcr.io/cosmonic-labs/openapi2mcp:v0.5.0
 ```
 
 Generate MCP tools into the server project from an OpenAPI specification:
@@ -66,52 +66,84 @@ Once your MCP server is ready for primetime, ensure your [Cosmonic][cosmonic] cl
 <details>
 <summary>Don't have a Comsonic cluster set up?</summary>
 
-First, sign up for a [FREE Cosmonic license][cosmonic-free-license].
 
-Once you have a license key, you can set up a Cosmonic cluster on any Kubernetes cluster
-that supports Helm:
+:::warning[Cosmonic Control required]
+You will need a Kubernetes cluster and an installation of Cosmonic Control to deploy the component. Sign-up for Cosmonic Control's [free trial](https://cosmonic.com/trial) and follow the [Get Started](/docs/install-cosmonic-control) instructions in the Cosmonic Control documentation. 
+:::
 
-```console
-helm install cosmonic-control oci://ghcr.io/cosmonic/cosmonic-control \
-  --version 0.2.0 \
-  --namespace cosmonic-system \
-  --create-namespace \
+Requirements:
+
+* [`kubectl`](https://kubernetes.io/releases/download/)
+* [Helm](https://helm.sh/docs) v3.8.0+
+
+#### Install local Kubernetes environment
+
+For the best local Kubernetes development experience, we recommend installing `kind` with the following `kind-config.yaml` configuration:
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+# One control plane node and three "workers."
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30950
+    hostPort: 80
+    protocol: TCP
+```
+
+This will help enable simple local ingress with Envoy.
+
+Start the cluster:
+
+```shell
+kind create cluster --config=kind-config.yaml
+```
+
+#### Install Cosmonic Control
+
+:::warning[License key required]
+You'll need a **trial license key** to follow these instructions. Sign up for Cosmonic Control's [free trial](/trial) to get a key.
+:::
+
+Deploy Cosmonic Control to Kubernetes with Helm:
+
+```shell
+helm install cosmonic-control oci://ghcr.io/cosmonic/cosmonic-control\
+  --version 0.3.0\
+  --namespace cosmonic-system\
+  --create-namespace\
+  --set envoy.service.type=NodePort\
+  --set envoy.service.httpNodePort=30950\
   --set cosmonicLicenseKey="<insert license here>"
+```
 
-helm install hostgroup oci://ghcr.io/cosmonic/cosmonic-control-hostgroup --version 0.2.0 --namespace cosmonic-system --set http.enabled=true
+Deploy a HostGroup:
+
+```shell
+helm install hostgroup oci://ghcr.io/cosmonic/cosmonic-control-hostgroup --version 0.3.0 --namespace cosmonic-system
 ```
 </details>
 
-### Deploy the application
+### Deploy the application with Helm CLI
 
-With the operator up and running we can start a `HostGroup`, which is a set of [wasmCloud][wasmcloud]
-instances that are configured to work together.
+Make sure to substitute your own pushed image in the command below:
 
-### With Helm CLI
-
-```console
-# Note substitue your own pushed image
-helm install weather-gov-mcp oci://ghcr.io/cosmonic-labs/charts/http-sample \
-  -n weather-gov --create-namespace \
-  --set component.image=ghcr.io/cosmonic-labs/components/weather-gov-mcp:0.1.0 \
-  --set component.name=weather-gov-mcp 
+```shell
+helm install cosmonic-control oci://ghcr.io/cosmonic-labs/charts/http-trigger\
+  --version 0.1.2\
+  --set components.name=mcpserver\
+  --set components.image=ghcr.io/cosmonic-labs/petstore-mcp-server:v0.2.0\
+  --set ingress.host="mcpserver.localhost.cosmonic.sh"\
+  --set pathNote="/v1/mcp"
 ```
 
 ## Connect to the deployed MCP server
 
-If running with a k8s cluster, you can port forward:
+You can use [the official MCP model inspector][model-inspector] to connect. Start the MCP inspector via the following command:
 
 ```console
-kubectl -n cosmonic-system port-forward svc/hostgroup-default 9091:9091
-```
-
-Once you have a local port forward configured to your Cosmonic Control cluster,
-use [the official MCP model inspector][model-inspector] to connect.
-
-You can start the MCP inspector via the following command:
-
-```console
-npm run inspector
+npx @modelcontextprotocol/inspector
 ```
 
 [cosmonic]: https://cosmonic.com
