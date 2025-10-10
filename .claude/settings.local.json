@@ -16,7 +16,18 @@
       "Bash(npm test)",
       "Bash(timeout 30s npm run test:e2e)",
       "Bash(npm run lint)",
-      "Bash(timeout 10s npm run test:e2e)"
+      "Bash(timeout 10s npm run test:e2e)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh api:*)",
+      "Read(//private/tmp/**)",
+      "Bash(git sparse-checkout:*)",
+      "Bash(gh pr checkout:*)",
+      "Read(//tmp/hono-mcp-pr/packages/mcp/src/**)",
+      "Bash(mkdir:*)",
+      "Bash(npm run build:ts:*)",
+      "Bash(tree:*)"
     ],
     "deny": []
   }

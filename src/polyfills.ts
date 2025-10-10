@@ -107,3 +107,36 @@ export function getCrypto() {
   }
   return globalThis.crypto;
 }
+
+// Polyfill for randomUUID from node:crypto
+export function randomUUID(): string {
+  const crypto = getCrypto();
+  return crypto.randomUUID();
+}
+
+// Polyfill for randomBytes from node:crypto
+export function randomBytes(size: number): Buffer {
+  const crypto = getCrypto();
+  const bytes = crypto.getRandomValues(new Uint8Array(size));
+  // Convert Uint8Array to Buffer-like object
+  return {
+    ...bytes,
+    toString(encoding: string): string {
+      if (encoding === 'hex') {
+        return Array.from(bytes)
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+      }
+      throw new Error(`Unsupported encoding: ${encoding}`);
+    }
+  } as any;
+}
+
+// Default export for node:crypto compatibility
+const cryptoPolyfill = {
+  randomUUID,
+  randomBytes,
+  getCrypto,
+};
+
+export default cryptoPolyfill;

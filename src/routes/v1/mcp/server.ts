@@ -1,6 +1,6 @@
 import { McpServer as UpstreamMCPServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import { StreamableHTTPTransport } from "@hono/mcp";
+import { StreamableHTTPTransport } from "../../../vendor/@hono/mcp/index.js";
 import { Context } from "hono";
 
 import { setupAllTools } from "./tools";

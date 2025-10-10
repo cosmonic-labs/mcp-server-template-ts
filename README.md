@@ -3,6 +3,11 @@
 Template repository for creating a WebAssembly component [Model Context Protocol (MCP)][mcp] Server,
 with [wasmCloud][wasmcloud].
 
+This template includes advanced features from [@hono/mcp](https://github.com/honojs/middleware/tree/main/packages/mcp):
+- **Multiple transport options**: Stateless HTTP or Server-Sent Events (SSE)
+- **OAuth 2.0 authentication**: Full authorization server with PKCE support
+- **Security features**: DNS rebinding protection, rate limiting, session management
+
 [mcp]: https://modelcontextprotocol.io/docs/getting-started/intro
 [wasmcloud]: https://wasmcloud.com
 
@@ -42,6 +47,37 @@ npm run inspector
 Using the model inspector you can connect to the local MCP server via HTTP, manipulate resources, run tools, and more.
 
 [model-inspector]: https://github.com/modelcontextprotocol/inspector
+
+## Features & Documentation
+
+### Transport Options
+
+This template supports two transport modes:
+
+1. **Streamable HTTP Transport** (default) - Stateless request/response with optional SSE streaming
+2. **SSE Transport** - Persistent Server-Sent Events for server push notifications
+
+📖 **[Transport Documentation](docs/TRANSPORTS.md)** - Learn about transport options and configuration
+
+### Authentication
+
+Add OAuth 2.0 authentication to your MCP server with built-in support for:
+- Authorization Code flow with PKCE
+- Token refresh and revocation
+- Dynamic client registration
+- Rate limiting
+
+📖 **[Authentication Guide](docs/AUTHENTICATION.md)** - Set up OAuth for your MCP server
+
+### Examples
+
+The `/examples` directory contains complete working examples:
+
+- **[basic-http.ts](examples/basic-http.ts)** - Simple stateless HTTP server
+- **[sse-transport.ts](examples/sse-transport.ts)** - Server-Sent Events with persistent connections
+- **[with-auth.ts](examples/with-auth.ts)** - OAuth 2.0 authentication setup
+
+📖 **[Examples README](examples/README.md)** - Overview and usage guide for all examples
 
 ## Optional: Generate MCP tools with the `openapi2mcp` plugin
 
