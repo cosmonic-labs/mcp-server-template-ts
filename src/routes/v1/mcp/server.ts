@@ -1,10 +1,20 @@
-import { McpServer as UpstreamMCPServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer as UpstreamMCPServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { StreamableHTTPTransport } from "@hono/mcp";
-import { Context } from "hono";
+import { StreamableHTTPTransport } from '@hono/mcp';
+import { Context } from 'hono';
 
-import { setupAllTools } from "./tools";
-import { setupAllResources } from "./resources";
+import { setupAllTools } from './tools';
+import { setupAllResources } from './resources';
+import {
+  OAuthConfig,
+  ProxyOAuthServerProvider,
+  setupOAuthProvider,
+} from './auth';
+
+// Used for OAuth support
+// Uncomment and configure for authenticated backends
+// import { setupOAuthProvider, type OAuthConfig } from "./auth";
+// import {getAll as getConfig} from 'wasi:config/runtime@0.2.0-draft';
 
 export class MCPServer extends UpstreamMCPServer {
   constructor(opts: any) {
@@ -21,9 +31,41 @@ export class MCPServer extends UpstreamMCPServer {
     const method = c.req.method;
 
     // Only POST is supported right now
-    if (method !== "POST") {
-      return c.text("Method not allowed", 405);
+    if (method !== 'POST') {
+      return c.text('Method not allowed', 405);
     }
+
+    // OAuth Authentication (commented out for template use)
+    // Uncomment for authenticated backends
+    const oauthConfig: OAuthConfig = {
+      authorizationServerUrl:
+        'https://developer.api.autodesk.com/authentication/v2/authorize',
+      clientId: 'WBSAW6GUYYpPneabmTlxjAHUGA32PyGI4AA2JPfAgq2RUSKj',
+      // TODO: get from config/env
+      clientSecret: '',
+      scope: 'data:read data:write account:read',
+      resourceIndicator: 'mcp://server',
+    };
+
+    const oauthProvider = setupOAuthProvider({} as any, oauthConfig);
+    if (oauthProvider) {
+      const authResult = await oauthProvider.authenticateRequest(c);
+
+      if (!authResult.authenticated) {
+        return c.json(
+          {
+            error: {
+              code: -32600,
+              message: 'Authentication required',
+              data: 'Valid OAuth access token required in Authorization header',
+            },
+          },
+          401
+        );
+      }
+    }
+
+    // User context is available in authResult.user for authorized requests
 
     // Handle POST requests (JSON-RPC messages)
     const body = await c.req.json();
@@ -41,12 +83,12 @@ export class MCPServer extends UpstreamMCPServer {
     // TODO: Transport generation/hydration as a Hono middleware?
 
     const server = new MCPServer({
-      name: "example-server",
-      version: "1.0.0",
+      name: 'example-server',
+      version: '1.0.0',
     });
     await server.connect(transport as any);
 
     const response = await transport.handleRequest(c, body);
-    return response || c.text("OK");
+    return response || c.text('OK');
   }
 }
