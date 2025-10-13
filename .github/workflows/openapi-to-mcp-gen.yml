@@ -8,6 +8,9 @@ on:
                 required: false
                 default: './openapi/spec.yaml'
                 type: string
+    push:
+        paths:
+            - 'openapi/spec.yaml'
 
 jobs:
     generate:
