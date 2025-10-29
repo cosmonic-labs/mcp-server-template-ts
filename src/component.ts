@@ -14,9 +14,7 @@ const server = new Hono();
 server.use(logger());
 
 server.get("/", async (c) => {
-  // You can pass environment variables when you run this via:
-  // `wasmtime serve -Scli --env TEST=example dist/component.wasm`
-  return c.json({ msg: "Hello world!", envVars: c.env });
+  return c.json({ msg: "MCP endpoint is at /v1/mcp", envVars: c.env });
 });
 
 setupRoutes(server);
