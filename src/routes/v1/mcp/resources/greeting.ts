@@ -1,8 +1,8 @@
-import { McpServer as UpstreamMCPServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { MCPServer } from "../server";
 
 import { ReadResourceResult } from "@modelcontextprotocol/sdk/types.js";
 
-export function setupResource<S extends UpstreamMCPServer>(server: S) {
+export function setupResource(server: MCPServer) {
   // Create a simple resource at a fixed URI
   server.resource(
     "greeting-resource",

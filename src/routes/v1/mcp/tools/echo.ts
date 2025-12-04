@@ -1,8 +1,8 @@
 import z from "zod";
 
-import { McpServer as UpstreamMCPServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { MCPServer } from "../server";
 
-export function setupTool<S extends UpstreamMCPServer>(server: S) {
+export function setupTool(server: MCPServer) {
   // Register a tool specifically for testing resumability
   server.tool(
     "echo",
