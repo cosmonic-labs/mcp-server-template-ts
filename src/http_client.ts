@@ -16,7 +16,7 @@ export interface CallParams {
     headers?: Record<string, string>;
     body?: RequestInit['body'];
     // START_OF Features.Auth
-    authorizationHeader?: string;
+    // authorizationHeader?: string;
     // END_OF Features.Auth
 }
 

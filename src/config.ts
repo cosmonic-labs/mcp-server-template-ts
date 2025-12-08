@@ -6,9 +6,9 @@ export * from "./constants.js";
 // static config
 export const SERVER_BASE_PATH = "/v1";
 export const MCP_SERVER_BASE_PATH = `${SERVER_BASE_PATH}/mcp`;
-export const OAUTH_REDIRECT_PATH = `/oauth/callback`;
-
 // START_OF Features.Auth
+// export const OAUTH_REDIRECT_PATH = `/oauth/callback`;
+
 // // dynamic config
 // export interface DynamicConfig {
 //     MCP_SERVER_BASE_URL: string;
