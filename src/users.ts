@@ -34,7 +34,7 @@
 //             if ((e as ErrorCode) === "no-entry") {
 //                 return false;
 //             }
-//             return false;
+//             throw e;
 //         }
 //         return true;
 //     }
@@ -51,11 +51,12 @@
 //     private readFile(file: Descriptor): string {
 //         const size = file.stat().size;
 //         const [data, _eof] = file.read(size, 0n);
-//         const users = new TextDecoder().decode(data);
-//         return users;
+//         return new TextDecoder().decode(data);
 //     }
-    
+
 //     private writeFile(file: Descriptor, data: string) {
+//         /* Truncate file before writing to avoid leftover bytes from previous content */
+//         file.setSize(0n);
 //         file.write(new TextEncoder().encode(data), 0n);
 //     }
 
@@ -125,7 +126,8 @@
 //     id: string;
 //     access_token: string;
 //     refresh_token: string;
-//     expires_at: Date;
+//     /** ISO 8601 date string for JSON serialization compatibility */
+//     expires_at: string;
 //     token_type: string;
 // }
 
@@ -134,9 +136,7 @@
 //         id: crypto.randomUUID(),
 //         access_token: oAuthTokenResponse.access_token,
 //         refresh_token: oAuthTokenResponse.refresh_token,
-//         expires_at: new Date(
-//             Date.now() + oAuthTokenResponse.expires_in * 1000,
-//         ),
+//         expires_at: new Date(Date.now() + oAuthTokenResponse.expires_in * 1000).toISOString(),
 //         token_type: oAuthTokenResponse.token_type,
 //     };
 // }
@@ -144,9 +144,7 @@
 // export function refreshedUsersAccessToken(user: User, oAuthTokenResponse: OAuthTokenResponse): void {
 //     user.access_token = oAuthTokenResponse.access_token;
 //     user.refresh_token = oAuthTokenResponse.refresh_token;
-//     user.expires_at = new Date(
-//         Date.now() + oAuthTokenResponse.expires_in * 1000,
-//     );
+//     user.expires_at = new Date(Date.now() + oAuthTokenResponse.expires_in * 1000).toISOString();
 //     user.token_type = oAuthTokenResponse.token_type;
 // }
 
@@ -245,8 +243,9 @@
 // export async function refreshAccessTokenIfNeeded(
 //     user: User,
 // ): Promise<RefreshAccessTokenIfNeededResult> {
-//     if (user.access_token && user.expires_at && user.expires_at > new Date()) {
-//         return { error: "Access token is still valid" };
+//     /* Token is still valid, no refresh needed */
+//     if (user.access_token && user.expires_at && new Date(user.expires_at) > new Date()) {
+//         return;
 //     }
 
 //     if (!user.refresh_token) {

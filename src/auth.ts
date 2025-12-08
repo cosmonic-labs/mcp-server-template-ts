@@ -11,8 +11,7 @@
 
 // /**
 //  * Performs validation of authentication on a given call.
-//  *
-//  * @throws {Error} if validation fails for any reason
+//  * On success, sets the Authorization header on params with the user's access token.
 //  */
 // export async function validateAuth(params: CallParams): Promise<ValidateAuthResult> {
 //     if (!params.authorizationHeader) {

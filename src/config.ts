@@ -3,13 +3,13 @@ export * from "./constants.js";
 // import { get } from "wasi:config/store@0.2.0-rc.1";
 // END_OF Features.Auth
 
-// static config
+/* static config */
 export const SERVER_BASE_PATH = "/v1";
 export const MCP_SERVER_BASE_PATH = `${SERVER_BASE_PATH}/mcp`;
 // START_OF Features.Auth
 // export const OAUTH_REDIRECT_PATH = `/oauth/callback`;
 
-// // dynamic config
+// /* dynamic config */
 // export interface DynamicConfig {
 //     MCP_SERVER_BASE_URL: string;
 //     CLIENT_ID: string;
@@ -24,7 +24,7 @@ export const MCP_SERVER_BASE_PATH = `${SERVER_BASE_PATH}/mcp`;
 //         return cachedConfig;
 //     }
 
-//     let missingConfigs = [];
+//     const missingConfigs: string[] = [];
 
 //     const MCP_SERVER_BASE_URL = get("MCP_SERVER_BASE_URL");
 //     if (!MCP_SERVER_BASE_URL) {

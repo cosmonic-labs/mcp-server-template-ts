@@ -2,6 +2,16 @@ import { API_BASE_URL } from "./config";
 // START_OF Features.Auth
 // import { dynamicConfig, SERVER_BASE_PATH } from "./config";
 // import { validateAuth, ValidateAuthError } from "./auth";
+
+// /** Escape HTML special characters to prevent XSS */
+// function escapeHtml(str: string): string {
+//     return str
+//         .replace(/&/g, "&amp;")
+//         .replace(/</g, "&lt;")
+//         .replace(/>/g, "&gt;")
+//         .replace(/"/g, "&quot;")
+//         .replace(/'/g, "&#039;");
+// }
 // END_OF Features.Auth
 
 export interface HTTPClientParams {
@@ -31,7 +41,7 @@ export class HTTPClient {
         // START_OF Features.Auth
         // const validateAuthResult = await validateAuth(params);
 
-        // const signupUrl = dynamicConfig().MCP_SERVER_BASE_URL + SERVER_BASE_PATH + "/signup";
+        // const signupUrl = new URL(SERVER_BASE_PATH + "/signup", dynamicConfig().MCP_SERVER_BASE_URL);
         // if (validateAuthResult === ValidateAuthError.LoginRequired) {
         //     const body = `<p>Login required. Please visit <a href="${signupUrl}">${signupUrl}</a> to sign up.</p>`;
         //     return new Response(body, {

@@ -37,7 +37,9 @@
     "test": "npm run test:e2e",
     "test:smoke": "PORT=8080 scripts/test.bash",
     "test:e2e": "vitest -c test/vitest.e2e.ts --run",
-    "inspector": "npx @modelcontextprotocol/inspector"
+    "inspector": "npx @modelcontextprotocol/inspector",
+    "enable-feature": "node scripts/feature.js enable",
+    "disable-feature": "node scripts/feature.js disable"
   },
   "license": "Apache-2.0",
   "author": "Cosmonic",
