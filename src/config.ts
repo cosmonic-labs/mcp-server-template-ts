@@ -45,11 +45,15 @@ export const MCP_SERVER_BASE_PATH = `${SERVER_BASE_PATH}/mcp`;
 
 //     const OAUTH_REDIRECT_URL = MCP_SERVER_BASE_URL + SERVER_BASE_PATH + OAUTH_REDIRECT_PATH;
 
-//     return {
+//     const config = {
 //         MCP_SERVER_BASE_URL: MCP_SERVER_BASE_URL!,
 //         CLIENT_ID: CLIENT_ID!,
 //         CLIENT_SECRET: CLIENT_SECRET!,
 //         OAUTH_REDIRECT_URL: OAUTH_REDIRECT_URL!,
 //     };
+
+//     cachedConfig = config;
+
+//     return cachedConfig;
 // }
 // END_OF Features.Auth
