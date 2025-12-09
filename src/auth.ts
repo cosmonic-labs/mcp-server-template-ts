@@ -23,7 +23,7 @@
 //     }
 
 //     const refreshResult = await refreshAccessTokenIfNeeded(user);
-//     if (refreshResult.error) {
+//     if (refreshResult && refreshResult.error) {
 //         throw new Error("Failed to refresh access token");
 //     }
 
