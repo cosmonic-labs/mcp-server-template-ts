@@ -2,6 +2,11 @@ package local:server;
 
 world component {
   import wasi:cli/environment@0.2.3;
+  // START_OF Features.Auth
+  // import wasi:config/store@0.2.0-rc.1;
+  // import wasi:filesystem/types@0.2.6;
+  // import wasi:filesystem/preopens@0.2.6;
+  // END_OF Features.Auth
 
   // The StarlingMonkey engine provides the ability to use fetchEvent to handle
   // calls to wasi:http/incoming-handler@0.2.0#handle. When targeting worlds that

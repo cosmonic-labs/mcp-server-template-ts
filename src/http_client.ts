@@ -1,5 +1,18 @@
-import { BASE_URL } from "./constants";
-import { validateAuth } from "./auth";
+import { API_BASE_URL } from "./config";
+// START_OF Features.Auth
+// import { dynamicConfig, SERVER_BASE_PATH } from "./config";
+// import { validateAuth, ValidateAuthError } from "./auth";
+
+// /** Escape HTML special characters to prevent XSS */
+// function escapeHtml(str: string): string {
+//     return str
+//         .replace(/&/g, "&amp;")
+//         .replace(/</g, "&lt;")
+//         .replace(/>/g, "&gt;")
+//         .replace(/"/g, "&quot;")
+//         .replace(/'/g, "&#039;");
+// }
+// END_OF Features.Auth
 
 export interface HTTPClientParams {
     baseUrl: string;
@@ -12,6 +25,9 @@ export interface CallParams {
     method?: RequestInit['method'];
     headers?: Record<string, string>;
     body?: RequestInit['body'];
+    // START_OF Features.Auth
+    // authorizationHeader?: string;
+    // END_OF Features.Auth
 }
 
 export class HTTPClient {
@@ -22,7 +38,28 @@ export class HTTPClient {
     }
 
     public async call(params: CallParams): Promise<Response> {
-        await validateAuth(params);
+        // START_OF Features.Auth
+        // const validateAuthResult = await validateAuth(params);
+
+        // const signupUrl = new URL(SERVER_BASE_PATH + "/signup", dynamicConfig().MCP_SERVER_BASE_URL);
+        // if (validateAuthResult === ValidateAuthError.LoginRequired) {
+        //     const body = `<p>Login required. Please visit <a href="${signupUrl}">${signupUrl}</a> to sign up.</p>`;
+        //     return new Response(body, {
+        //         status: 401,
+        //         headers: {
+        //             "Content-Type": "text/html",
+        //         },
+        //     });
+        // } else if (validateAuthResult === ValidateAuthError.UserNotFound) {
+        //     const body = `<h1>User not found</h1><p>Please sign up again at <a href="${signupUrl}">${signupUrl}</a></p>`;
+        //     return new Response(body, {
+        //         status: 401,
+        //         headers: {
+        //             "Content-Type": "text/html",
+        //         },
+        //     });
+        // }
+        // END_OF Features.Auth
 
         let path = params.path;
         for (const [key, value] of Object.entries(params.pathParams ?? {})) {
@@ -39,5 +76,5 @@ export class HTTPClient {
 }
 
 export const httpClient = new HTTPClient({
-    baseUrl: BASE_URL,
+    baseUrl: API_BASE_URL,
 });
