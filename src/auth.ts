@@ -22,7 +22,10 @@
 //         return ValidateAuthError.UserNotFound;
 //     }
 
-//     await refreshAccessTokenIfNeeded(user);
+//     const refreshResult = await refreshAccessTokenIfNeeded(user);
+//     if (refreshResult.error) {
+//         throw new Error("Failed to refresh access token");
+//     }
 
 //     if (!params.headers) {
 //         params.headers = {};
