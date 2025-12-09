@@ -5,7 +5,7 @@ import {
   setupE2E,
   setupMCPClient,
 } from "../common.js";
-import { MCP_BASE_PATH } from "../../src/routes/v1/mcp/index.js";
+import { MCP_SERVER_BASE_PATH } from "../../src/config.js";
 
 suite("MCP component", () => {
   /** Path to the component that should be used for these tests */
@@ -18,7 +18,7 @@ suite("MCP component", () => {
 
   test("works", async () => {
     using testSetup = await setupE2E({
-      path: MCP_BASE_PATH,
+      path: MCP_SERVER_BASE_PATH,
       testWASMPath,
     });
 

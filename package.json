@@ -37,7 +37,9 @@
     "test": "npm run test:e2e",
     "test:smoke": "PORT=8080 scripts/test.bash",
     "test:e2e": "vitest -c test/vitest.e2e.ts --run",
-    "inspector": "npx @modelcontextprotocol/inspector"
+    "inspector": "npx @modelcontextprotocol/inspector",
+    "enable-feature": "node scripts/feature.js enable",
+    "disable-feature": "node scripts/feature.js disable"
   },
   "license": "Apache-2.0",
   "author": "Cosmonic",
@@ -67,7 +69,7 @@
     "wait-on": "^8.0.3"
   },
   "dependencies": {
-    "@hono/mcp": "^0.1.1",
+    "@hono/mcp": "^0.2.2",
     "@hono/node-server": "^1.14.3",
     "@hono/swagger-ui": "^0.5.2",
     "@modelcontextprotocol/sdk": "^1.20.0",
