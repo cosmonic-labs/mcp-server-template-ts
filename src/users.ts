@@ -31,7 +31,7 @@
 //         try {
 //             this.directory().statAt({}, path)
 //         } catch (e) {
-//             if ((e as ErrorCode) === "no-entry") {
+//             if (((e as any).message as ErrorCode) === "no-entry") {
 //                 return false;
 //             }
 //             throw e;
