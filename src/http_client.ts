@@ -18,13 +18,13 @@ export interface HTTPClientParams {
     baseUrl: string;
 }
 
-export interface CallParams {
+export interface CallParams<T> {
     path: string;
     pathParams?: Record<string, string>;
-    query?: Record<string, string>;
+    query?: Record<string, string | undefined>;
     method?: RequestInit['method'];
-    headers?: Record<string, string>;
-    body?: RequestInit['body'];
+    headers?: Record<string, string | undefined>;
+    body?: T;
     // START_OF Features.Auth
     // authorizationHeader?: string;
     // END_OF Features.Auth
@@ -37,7 +37,23 @@ export class HTTPClient {
         this.baseUrl = params.baseUrl;
     }
 
-    public async call(params: CallParams): Promise<Response> {
+    public async call<T>(params: CallParams<T>): Promise<Response> {
+        let headers: Record<string, string> = {};
+        if (params.headers) {
+            const nonEmptyHeaders = Object.entries(params.headers).filter(([_, value]) => {
+                return typeof value === "string";
+            });
+            headers = Object.fromEntries(nonEmptyHeaders) as Record<string, string>;
+        }
+
+        let query: Record<string, string> = {};
+        if (params.query) {
+            const nonEmptyQuery = Object.entries(params.query).filter(([_, value]) => {
+                return typeof value === "string";
+            });
+            query = Object.fromEntries(nonEmptyQuery) as Record<string, string>;
+        }
+
         // START_OF Features.Auth
         // const validateAuthResult = await validateAuth(params);
 
@@ -67,10 +83,10 @@ export class HTTPClient {
         }
         console.assert(!path.includes('{'), `Not all path params were replaced in path: ${path}`);
 
-        return fetch(`${this.baseUrl}${path}?${new URLSearchParams(params.query).toString()}`, {
+        return fetch(`${this.baseUrl}${path}?${new URLSearchParams(query).toString()}`, {
             method: params.method,
-            headers: params.headers,
-            body: params.body,
+            headers,
+            body: JSON.stringify(params.body),
         });
     }
 }
