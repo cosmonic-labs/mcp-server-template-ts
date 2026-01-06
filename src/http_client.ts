@@ -38,22 +38,6 @@ export class HTTPClient {
     }
 
     public async call<T>(params: CallParams<T>): Promise<Response> {
-        let headers: Record<string, string> = {};
-        if (params.headers) {
-            const nonEmptyHeaders = Object.entries(params.headers).filter(([_, value]) => {
-                return typeof value === "string";
-            });
-            headers = Object.fromEntries(nonEmptyHeaders) as Record<string, string>;
-        }
-
-        let query: Record<string, string> = {};
-        if (params.query) {
-            const nonEmptyQuery = Object.entries(params.query).filter(([_, value]) => {
-                return typeof value === "string";
-            });
-            query = Object.fromEntries(nonEmptyQuery) as Record<string, string>;
-        }
-
         // START_OF Features.Auth
         // const validateAuthResult = await validateAuth(params);
 
@@ -76,6 +60,22 @@ export class HTTPClient {
         //     });
         // }
         // END_OF Features.Auth
+
+        let headers: Record<string, string> = {};
+        if (params.headers) {
+            const nonEmptyHeaders = Object.entries(params.headers).filter(([_, value]) => {
+                return typeof value === "string";
+            });
+            headers = Object.fromEntries(nonEmptyHeaders) as Record<string, string>;
+        }
+
+        let query: Record<string, string> = {};
+        if (params.query) {
+            const nonEmptyQuery = Object.entries(params.query).filter(([_, value]) => {
+                return typeof value === "string";
+            });
+            query = Object.fromEntries(nonEmptyQuery) as Record<string, string>;
+        }
 
         let path = params.path;
         for (const [key, value] of Object.entries(params.pathParams ?? {})) {
