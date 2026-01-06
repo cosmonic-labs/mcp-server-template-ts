@@ -13,7 +13,7 @@
 //  * Performs validation of authentication on a given call.
 //  * On success, sets the Authorization header on params with the user's access token.
 //  */
-// export async function validateAuth(params: CallParams): Promise<ValidateAuthResult> {
+// export async function validateAuth(params: CallParams<unknown>): Promise<ValidateAuthResult> {
 //     if (!params.authorizationHeader) {
 //         return ValidateAuthError.LoginRequired;
 //     }
