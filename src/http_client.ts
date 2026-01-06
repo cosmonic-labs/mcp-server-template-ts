@@ -83,11 +83,27 @@ export class HTTPClient {
         }
         console.assert(!path.includes('{'), `Not all path params were replaced in path: ${path}`);
 
-        return fetch(`${this.baseUrl}${path}?${new URLSearchParams(query).toString()}`, {
+        let res = await fetch(`${this.baseUrl}${path}?${new URLSearchParams(query).toString()}`, {
             method: params.method,
             headers,
             body: JSON.stringify(params.body),
         });
+
+        // manually redirect since StarlingMonkey doesn't do it automatically yet
+        // https://github.com/bytecodealliance/StarlingMonkey/issues/297
+        // TODO: remove once fixed in StarlingMonkey
+        if (res.status === 301 || res.status === 302 || res.status === 307 || res.status === 308) {
+            let location = res.headers.get('Location');
+            if (!location) throw new Error('Location header not found');
+
+            res = await fetch(location, {
+                method: params.method,
+                headers,
+                body: JSON.stringify(params.body),
+            });
+        }
+
+        return res;
     }
 }
 
