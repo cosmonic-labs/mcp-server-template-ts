@@ -1,4 +1,4 @@
-export * from "./constants.js";
+export * from "./constants";
 // START_OF Features.Auth
 // import { get } from "wasi:config/store@0.2.0-rc.1";
 // END_OF Features.Auth

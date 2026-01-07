@@ -4,8 +4,8 @@ import {
   ensureTestComponentBuild,
   setupE2E,
   setupMCPClient,
-} from "../common.js";
-import { MCP_SERVER_BASE_PATH } from "../../src/config.js";
+} from "../common";
+import { MCP_SERVER_BASE_PATH } from "../../src/config";
 
 suite("MCP component", () => {
   /** Path to the component that should be used for these tests */

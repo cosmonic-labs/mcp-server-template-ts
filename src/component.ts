@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { showRoutes } from "hono/dev";
 import { logger } from "hono/logger";
 import { fire } from "hono/service-worker";
-// import { fire } from "./wasmcloud/hono-adapter/server.js";
+// import { fire } from "./wasmcloud/hono-adapter/server";
 
-import { setupRoutes } from "./routes/index.js";
-import { setupPolyfills } from "./polyfills.js";
+import { setupRoutes } from "./routes/index";
+import { setupPolyfills } from "./polyfills";
 
 // Set up polyfills for WASI environment
 setupPolyfills();

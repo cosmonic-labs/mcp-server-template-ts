@@ -1,8 +1,8 @@
 import type { Hono, Context } from "hono";
 
-import * as mcp from "./mcp/index.js";
+import * as mcp from "./mcp/index";
 // START_OF Features.Auth
-// import * as signup from "./signup.js";
+// import * as signup from "./signup";
 // END_OF Features.Auth
 
 /** Set up all v1 routes */
