@@ -81,7 +81,9 @@ export class HTTPClient {
         for (const [key, value] of Object.entries(params.pathParams ?? {})) {
             path = path.replace(`{${key}}`, value);
         }
-        console.assert(!path.includes('{'), `Not all path params were replaced in path: ${path}`);
+        if (path.includes('{')) {
+            throw new Error(`Not all path params were replaced in path: ${path}`);
+        }
 
         let res = await fetch(`${this.baseUrl}${path}?${new URLSearchParams(query).toString()}`, {
             method: params.method,
