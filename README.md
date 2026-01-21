@@ -12,17 +12,6 @@ with [wasmCloud][wasmcloud].
 
 [wash]: https://github.com/wasmcloud/wash
 
-# Quickstart
-
-Clone this repository or use `wash` to create a new project that uses this repo as a template:
-
-```console
-wash new mcpserver --git https://github.com/cosmonic-labs/mcp-server-template-ts.git
-```
-```console
-cd mcpserver
-```
-
 ## Start the development loop
 
 Build the component:
@@ -43,20 +32,16 @@ Using the model inspector you can connect to the local MCP server via HTTP, mani
 
 [model-inspector]: https://github.com/modelcontextprotocol/inspector
 
-## Optional: Generate MCP tools with the `openapi2mcp` plugin
+## Optional: Generate MCP tools from OpenAPI specification
 
-The [`openapi2mcp` plugin](https://github.com/cosmonic-labs/openapi2mcp) for `wash` enables you to generate MCP tools from an OpenAPI specification.
+You can generate MCP tools from an OpenAPI specification using the [`openapi2mcp`](https://github.com/cosmonic-labs/openapi2mcp) tool.
 
-Install the plugin:
+**Note:** The `npm run openapi2mcp` script requires an `openapi.json` file in your project root. (if you have an `openapi.yaml` file instead, you'll need to update the script in `package.json` to use `openapi.yaml` instead of `openapi.json`)
 
-```console
-wash plugin install ghcr.io/cosmonic-labs/openapi2mcp:v0.5.0
-```
-
-Generate MCP tools into the server project from an OpenAPI specification:
+Generate MCP tools from your OpenAPI specification:
 
 ```console
-wash openapi2mcp [path/to/open/yaml/or/json] --project-path [path/to/generated/mcp/server]
+npm run openapi2mcp
 ```
 
 ### Set up Cosmonic Control
