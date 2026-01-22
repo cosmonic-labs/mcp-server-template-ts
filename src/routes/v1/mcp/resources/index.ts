@@ -1,7 +1,7 @@
-import { MCPServer } from "../server";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import * as greetingResource from "./greeting";
+import { setupResource } from "./greeting";
 
-export function setupAllResources(server: MCPServer) {
-  greetingResource.setupResource(server);
+export function setupAllResources(server: McpServer) {
+  setupResource(server);
 }
