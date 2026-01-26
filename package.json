@@ -37,7 +37,7 @@
     "test": "npm run test:e2e",
     "test:smoke": "PORT=8080 scripts/test.bash",
     "test:e2e": "vitest -c test/vitest.e2e.ts --run",
-    "openapi2mcp": "openapi2mcp ./openapi.json --project-path .",
+    "openapi2mcp": "openapi2mcp $1 --project-path .",
     "inspector": "npx @modelcontextprotocol/inspector",
     "enable-feature": "node scripts/feature.js enable",
     "disable-feature": "node scripts/feature.js disable"

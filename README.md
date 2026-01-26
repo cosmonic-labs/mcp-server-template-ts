@@ -36,13 +36,13 @@ Using the model inspector you can connect to the local MCP server via HTTP, mani
 
 You can generate MCP tools from an OpenAPI specification using the [`openapi2mcp`](https://github.com/cosmonic-labs/openapi2mcp) tool.
 
-**Note:** The `npm run openapi2mcp` script requires an `openapi.json` file in your project root. (if you have an `openapi.yaml` file instead, you'll need to update the script in `package.json` to use `openapi.yaml` instead of `openapi.json`)
-
 Generate MCP tools from your OpenAPI specification:
 
 ```console
-npm run openapi2mcp
+npm run openapi2mcp path/to/openapi/spec.json
 ```
+
+**Note:** The path to the OpenAPI spec must be inside the repository for the `openapi2mcp` npm script to work.
 
 ### Set up Cosmonic Control
 
