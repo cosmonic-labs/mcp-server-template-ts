@@ -1,52 +1,31 @@
-import { McpServer as UpstreamMCPServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { Hono, Context } from "hono";
 import { StreamableHTTPTransport } from "@hono/mcp";
-import { Context } from "hono";
+import { SERVER_NAME, SERVER_VERSION } from "../../../constants";
+import { setupAllTools } from "./tools/index";
+import { setupAllResources } from "./resources/index";
 
-import { setupAllTools } from "./tools";
-import { setupAllResources } from "./resources";
+export const MCP_BASE_PATH = "/v1/mcp";
 
-export class MCPServer extends UpstreamMCPServer {
-  constructor(opts: any) {
-    super(opts);
-    const server = this;
-    setupAllTools(server);
-    setupAllResources(server);
-  }
+const mcpServer = new McpServer({
+  name: SERVER_NAME,
+  version: SERVER_VERSION,
+});
+setupAllTools(mcpServer);
+setupAllResources(mcpServer);
 
-  /**
-   * Handle HTTP requests for MCP communication (stateless)
-   */
-  static async handleMCPRequest(c: Context) {
-    const method = c.req.method;
+const transport = new StreamableHTTPTransport({
+  sessionIdGenerator: undefined,
+  enableDnsRebindingProtection: true,
+  // allowedHosts: ['127.0.0.1'],
+});
 
-    // Only POST is supported right now
-    if (method !== "POST") {
-      return c.text("Method not allowed", 405);
+export function setupMCPRoutes(app: Hono) {
+  app.post(MCP_BASE_PATH, async (context: Context) => {
+    if (!mcpServer.isConnected()) {
+      await mcpServer.connect(transport);
     }
 
-    // Handle POST requests (JSON-RPC messages)
-    const body = await c.req.json();
-
-    // Create a new transport and server for each request (stateless approach)
-    // This ensures each request is handled independently without relying on stored state
-    const transport = new StreamableHTTPTransport({
-      sessionIdGenerator: undefined,
-
-      // DNS rebinding protection is disabled by default for backwards compatibility.
-      enableDnsRebindingProtection: true,
-      // allowedHosts: ['127.0.0.1'],
-    });
-
-    // TODO: Transport generation/hydration as a Hono middleware?
-
-    const server = new MCPServer({
-      name: "example-server",
-      version: "1.0.0",
-    });
-    await server.connect(transport as any);
-
-    const response = await transport.handleRequest(c, body);
-    return response || c.text("OK");
-  }
+    return await transport.handleRequest(context);
+  });
 }
