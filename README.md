@@ -8,7 +8,7 @@ with [wasmCloud][wasmcloud].
 
 # Dependencies
 
-- Download [`wash`][wash]
+- Download [`wash`][wash] v2.0.0-rc.8 or higher
 
 [wash]: https://github.com/wasmcloud/wash
 
