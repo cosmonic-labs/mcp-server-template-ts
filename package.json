@@ -34,7 +34,7 @@
     "lint": "eslint src/**/*.js",
     "start": "npm run dev",
     "serve:wasmtime": "wasmtime serve -Scli dist/component.wasm",
-    "dev": "concurrently \"nodemon\" \"wait-on tcp:8000 && mcp-inspector --transport http --server-url http://localhost:8000/v1/mcp\"",
+    "dev": "concurrently \"nodemon\" \"wait-on http-get://localhost:8000 && mcp-inspector --transport http --server-url http://localhost:8000/v1/mcp\"",
     "test": "npm run test:e2e",
     "test:smoke": "PORT=8000 scripts/test.bash",
     "test:e2e": "vitest -c test/vitest.e2e.ts --run",
