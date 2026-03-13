@@ -10,7 +10,7 @@ with [wasmCloud][wasmcloud].
 
 - Download [`wash`][wash] v2.0.0-rc.8 or higher
 
-[wash]: https://github.com/wasmcloud/wash
+[wash]: https://github.com/wasmcloud/wasmcloud
 
 ## Start the development loop
 
