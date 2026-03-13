@@ -11,3 +11,4 @@ build
 *.tsbuildinfo.gz.br
 *.tsbuildinfo.gz.br.gz
 *.tsbuildinfo.gz.br.gz.br
+.claude
