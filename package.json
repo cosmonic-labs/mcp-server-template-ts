@@ -28,7 +28,7 @@
     "setup:wit": "npm run fetch:wit && npm run generate:types",
     "build:ts": "rollup -c",
     "build:component": "jco componentize -w wit -o dist/component.wasm dist/component.js",
-    "build": "npm run setup:wit && npm run build:ts && npm run build:component",
+    "build": "npm run generate:types && npm run build:ts && npm run build:component",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css}\"",
     "format-ci": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css}\"",
     "lint": "eslint src/**/*.js",
